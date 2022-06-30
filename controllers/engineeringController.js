@@ -97,6 +97,7 @@ exports.getPosts = CatchAsync(async (req, res, next) => {
 });
 
 exports.addFile = CatchAsync(async (req, res, next) => {
+  console.log('here now');
   const {
     branch,
     semester,
@@ -118,6 +119,8 @@ exports.addFile = CatchAsync(async (req, res, next) => {
     year,
     type,
   };
+
+  console.log(pyq);
 
   const newPyq = await Pyq.create(pyq);
 
@@ -204,9 +207,10 @@ exports.uploadFile = CatchAsync((req, res, next) => {
       console.log('File uploaded!');
     });
     console.log(req.hostname);
-    url = 'http://localhost:8000';
-    const filePath = path.join(url, `/pyqs/${file.name}`);
-    req.body.fileLink = uploadPath;
+    devUrl = 'http://localhost:8000';
+    stagingUrl = 'https://ninepointer-staging.herokuapp.com';
+    const filePath = path.join(stagingUrl, `/pyqs/${file.name}`);
+    req.body.fileLink = filePath;
     console.log(filePath);
     next();
   }

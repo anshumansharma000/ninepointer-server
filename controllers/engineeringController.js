@@ -199,17 +199,21 @@ exports.uploadFile = CatchAsync((req, res, next) => {
       '-' +
       req.body.subject +
       '-' +
-      req.body.year;
-    ('.pdf');
+      req.body.year +
+      '.pdf';
     file.mv(uploadPath, function (err) {
       if (err) console.log(err);
 
       console.log('File uploaded!');
     });
+
+    const newFileName =
+      req.body.branch + '-' + req.body.subject + '-' + req.body.year + '.pdf';
+
     console.log(req.hostname);
     devUrl = 'http://localhost:8000';
     stagingUrl = 'https://ninepointer-staging.herokuapp.com';
-    const filePath = path.join(stagingUrl, `/pyqs/${file.name}`);
+    const filePath = path.join(stagingUrl, `/pyqs/${newFileName}`);
     req.body.fileLink = filePath;
     console.log(filePath);
     next();

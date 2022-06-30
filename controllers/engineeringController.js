@@ -189,6 +189,10 @@ exports.uploadFile = CatchAsync((req, res, next) => {
   console.log(req.body);
   console.log(req.files);
   if (!req.files) {
+    if (req.body.url) {
+      req.body.fileLink = req.body.url;
+      next();
+    }
     return next(createCustomError('File not found', 404));
   } else {
     const file = req.files.file;

@@ -130,16 +130,23 @@ exports.addFile = CatchAsync(async (req, res, next) => {
 exports.getFiles = CatchAsync(async (req, res, next) => {
   //duplicating req.query
   const queryObj = { ...req.query };
-  const excludedFields = ['sort', 'limit', 'page', 'fields'];
+  const excludedFields = ['sort', 'limit', 'page', 'fields', 'subject'];
 
   //excluding sort limit page and fields from query object
   excludedFields.forEach((el) => delete queryObj[el]);
 
   let queryStr = JSON.stringify(queryObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
   let query = Pyq.find(JSON.parse(queryStr));
 
+  if (req.query.subject) {
+    query.find({
+      subject: {
+        $regex: req.query.subject,
+        $options: 'i',
+      },
+    });
+  }
   if (req.query.sort) {
     const sortBy = req.query.sort.split(',').join(' ');
     query = query.sort(sortBy);
@@ -199,7 +206,7 @@ exports.uploadFile = CatchAsync((req, res, next) => {
     console.log(req.hostname);
     url = 'http://localhost:8000';
     const filePath = path.join(url, `/pyqs/${file.name}`);
-    req.body.fileLink = filePath;
+    req.body.fileLink = uploadPath;
     console.log(filePath);
     next();
   }

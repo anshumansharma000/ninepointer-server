@@ -164,7 +164,7 @@ exports.getFiles = CatchAsync(async (req, res, next) => {
     query = query.select('-__v');
   }
 
-  const limit = req.query.limit * 1 || 5;
+  const limit = req.query.limit * 1 || 10;
   const page = req.query.page * 1 || 1;
   const skip = (page - 1) * limit;
 
@@ -192,8 +192,9 @@ exports.uploadFile = CatchAsync((req, res, next) => {
     if (req.body.url) {
       req.body.fileLink = req.body.url;
       next();
+    } else {
+      return next(createCustomError('File not found', 404));
     }
-    return next(createCustomError('File not found', 404));
   } else {
     const file = req.files.file;
     uploadPath =

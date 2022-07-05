@@ -14,6 +14,9 @@ app.use(fileUpload({ createParentPath: true }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.get('/', (req, res) => {
+  res.send('Hello from ninepointer!');
+});
 
 app.use('/api/v1/engineering/', engineeringRouter);
 // app.use('/api/v1/engineering/pyq', fileRouter);

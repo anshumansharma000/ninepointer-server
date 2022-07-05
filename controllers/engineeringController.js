@@ -97,7 +97,6 @@ exports.getPosts = CatchAsync(async (req, res, next) => {
 });
 
 exports.addFile = CatchAsync(async (req, res, next) => {
-  console.log('here now');
   const {
     branch,
     semester,
@@ -133,7 +132,14 @@ exports.addFile = CatchAsync(async (req, res, next) => {
 exports.getFiles = CatchAsync(async (req, res, next) => {
   //duplicating req.query
   const queryObj = { ...req.query };
-  const excludedFields = ['sort', 'limit', 'page', 'fields', 'subject'];
+  const excludedFields = [
+    'sort',
+    'limit',
+    'page',
+    'fields',
+    'subject',
+    'branch',
+  ];
 
   //excluding sort limit page and fields from query object
   excludedFields.forEach((el) => delete queryObj[el]);
@@ -142,12 +148,11 @@ exports.getFiles = CatchAsync(async (req, res, next) => {
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   let query = Pyq.find(JSON.parse(queryStr));
 
+  query.find({ $or: [{ branch: req.query.branch }, { branch: 'Common' }] });
+
   if (req.query.subject) {
     query.find({
-      subject: {
-        $regex: req.query.subject,
-        $options: 'i',
-      },
+      subject: { $regex: '.*' + req.query.subject + '.*', $options: 'i' },
     });
   }
   if (req.query.sort) {
@@ -197,6 +202,16 @@ exports.uploadFile = CatchAsync((req, res, next) => {
     }
   } else {
     const file = req.files.file;
+    console.log(file.mimetype);
+    console.log(file);
+    if (file.mimetype != 'application/pdf') {
+      return next(
+        createCustomError(
+          'File Type not supported. Please upload a pdf file. ',
+          400
+        )
+      );
+    }
     uploadPath =
       __dirname +
       '/../public/pyqs/' +
@@ -205,6 +220,7 @@ exports.uploadFile = CatchAsync((req, res, next) => {
       req.body.subject +
       '-' +
       req.body.year +
+      Date.now() +
       '.pdf';
     file.mv(uploadPath, function (err) {
       if (err) console.log(err);
@@ -213,7 +229,13 @@ exports.uploadFile = CatchAsync((req, res, next) => {
     });
 
     const newFileName =
-      req.body.branch + '-' + req.body.subject + '-' + req.body.year + '.pdf';
+      req.body.branch +
+      '-' +
+      req.body.subject +
+      '-' +
+      req.body.year +
+      Date.now() +
+      '.pdf';
 
     console.log(req.hostname);
     devUrl = 'http://localhost:8000';

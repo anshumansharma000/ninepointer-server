@@ -212,22 +212,6 @@ exports.uploadFile = CatchAsync((req, res, next) => {
         )
       );
     }
-    uploadPath =
-      __dirname +
-      '/../public/pyqs/' +
-      req.body.branch +
-      '-' +
-      req.body.subject +
-      '-' +
-      req.body.year +
-      Date.now() +
-      '.pdf';
-    file.mv(uploadPath, function (err) {
-      if (err) console.log(err);
-
-      console.log('File uploaded!');
-    });
-
     const newFileName =
       req.body.branch +
       '-' +
@@ -236,6 +220,13 @@ exports.uploadFile = CatchAsync((req, res, next) => {
       req.body.year +
       Date.now() +
       '.pdf';
+
+    uploadPath = __dirname + '/../public/pyqs/' + newFileName;
+    file.mv(uploadPath, function (err) {
+      if (err) console.log(err);
+
+      console.log('File uploaded!');
+    });
 
     console.log(req.hostname);
     devUrl = 'http://localhost:8000';

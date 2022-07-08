@@ -4,6 +4,7 @@ const Engineering = require('../models/Engineering');
 const Pyq = require('../models/pyq');
 const path = require('path');
 
+//create a new video
 exports.createPost = CatchAsync(async (req, res, next) => {
   const {
     branch,
@@ -35,6 +36,7 @@ exports.createPost = CatchAsync(async (req, res, next) => {
   });
 });
 
+//delete a video
 exports.deletePost = CatchAsync(async (req, res, next) => {
   const { branch, id } = req.params;
 
@@ -49,6 +51,7 @@ exports.deletePost = CatchAsync(async (req, res, next) => {
   });
 });
 
+//get videos
 exports.getPosts = CatchAsync(async (req, res, next) => {
   //duplicating req.query
   const queryObj = { ...req.query };
@@ -96,6 +99,7 @@ exports.getPosts = CatchAsync(async (req, res, next) => {
   });
 });
 
+//add a new pyq
 exports.addFile = CatchAsync(async (req, res, next) => {
   const {
     branch,
@@ -129,6 +133,7 @@ exports.addFile = CatchAsync(async (req, res, next) => {
   });
 });
 
+//get pyqs
 exports.getFiles = CatchAsync(async (req, res, next) => {
   //duplicating req.query
   const queryObj = { ...req.query };
@@ -148,7 +153,8 @@ exports.getFiles = CatchAsync(async (req, res, next) => {
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   let query = Pyq.find(JSON.parse(queryStr));
 
-  query.find({ $or: [{ branch: req.query.branch }, { branch: 'Common' }] });
+  if (req.query.branch)
+    query.find({ $or: [{ branch: req.query.branch }, { branch: 'Common' }] });
 
   if (req.query.subject) {
     query.find({
@@ -189,21 +195,25 @@ exports.getFiles = CatchAsync(async (req, res, next) => {
   });
 });
 
+//upload file to server
 exports.uploadFile = CatchAsync((req, res, next) => {
-  console.log('hello there!');
   console.log(req.body);
   console.log(req.files);
+  //check for file
   if (!req.files) {
+    //check for external file url
     if (req.body.url) {
       req.body.fileLink = req.body.url;
       next();
     } else {
+      //if no file or url
       return next(createCustomError('File not found', 404));
     }
   } else {
     const file = req.files.file;
     console.log(file.mimetype);
     console.log(file);
+    //check for pdf files
     if (file.mimetype != 'application/pdf') {
       return next(
         createCustomError(
@@ -212,6 +222,7 @@ exports.uploadFile = CatchAsync((req, res, next) => {
         )
       );
     }
+    //create a file path for server file system
     const newFileName =
       req.body.branch +
       '-' +
@@ -220,11 +231,10 @@ exports.uploadFile = CatchAsync((req, res, next) => {
       req.body.year +
       Date.now() +
       '.pdf';
-
     uploadPath = __dirname + '/../public/pyqs/' + newFileName;
+    //moving file to server file system
     file.mv(uploadPath, function (err) {
       if (err) console.log(err);
-
       console.log('File uploaded!');
     });
 

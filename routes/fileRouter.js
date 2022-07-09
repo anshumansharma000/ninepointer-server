@@ -5,6 +5,6 @@ const uploadFile = require('../middlewares/uploadFile');
 router
   .route('/')
   .get(engineeringController.getFiles)
-  .post(engineeringController.uploadFile, engineeringController.addFile);
+  .post(engineeringController.addFile);
 
 module.exports = router;

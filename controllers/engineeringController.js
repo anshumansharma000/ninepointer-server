@@ -101,6 +101,10 @@ exports.getPosts = CatchAsync(async (req, res, next) => {
 
 //add a new pyq
 exports.addFile = CatchAsync(async (req, res, next) => {
+  if (req.body.url && !req.body.fileLink) {
+    console.log(req.body.url);
+    req.body.fileLink = req.body.url;
+  }
   const {
     branch,
     semester,

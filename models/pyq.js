@@ -48,6 +48,9 @@ const pyqSchema = new mongoose.Schema({
   author: {
     type: String,
   },
+  solutionLink: {
+    type: String,
+  },
 });
 
 const pyq = mongoose.model('pyq', pyqSchema);

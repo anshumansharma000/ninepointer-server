@@ -114,6 +114,7 @@ exports.addFile = CatchAsync(async (req, res, next) => {
     author,
     year,
     type,
+    solutionLink,
   } = req.body;
   //TODO:generate file link and add it in pyq object
   const pyq = {
@@ -125,6 +126,7 @@ exports.addFile = CatchAsync(async (req, res, next) => {
     author,
     year,
     type,
+    solutionLink,
   };
 
   console.log(pyq);

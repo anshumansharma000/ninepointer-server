@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const VideoSchema = new mongoose.Schema({
+const videoSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Video type is required'],
@@ -8,7 +8,7 @@ const VideoSchema = new mongoose.Schema({
   },
   title: {
     type: String,
-    required: [true, 'Videoa title is required'],
+    required: [true, 'Video title is required'],
   },
 
   description: {
@@ -40,10 +40,26 @@ const VideoSchema = new mongoose.Schema({
   lastEdited: {
     type: Date,
   },
-  author: {
+  creator: {
     type: String,
   },
 });
 
-const Engineering = mongoose.model('Video', VideoSchema);
+videoSchema.pre('save', function (next) {
+  //Only add thumbnail link once after a video is added.
+  if (!this.isNew) {
+    return next();
+  }
+  //add the thumbnail link
+  console.log(this.videoLink);
+  console.log(this.videoLink.split('/')[3][0] == 'w');
+  const videoId = this.videoLink.split('/')[3].startsWith('watch')
+    ? this.videoLink.split('/')[3].split('=')[1]
+    : this.videoLink.split('/')[3][0];
+  console.log('videoId'.videoId);
+  this.thumbnail = `https://img.youtube.com/vi/${videoId}/0.jpg`;
+  next();
+});
+
+const Video = mongoose.model('Video', videoSchema);
 module.exports = Video;

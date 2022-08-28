@@ -7,4 +7,8 @@ router
   .get(engineeringController.getFiles)
   .post(engineeringController.addFile);
 
+router
+  .route('/:id')
+  .get(engineeringController.getFile)
+  .patch(engineeringController.updateFile);
 module.exports = router;

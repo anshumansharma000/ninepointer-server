@@ -253,3 +253,47 @@ exports.uploadFile = CatchAsync((req, res, next) => {
     next();
   }
 });
+
+//get a single file from server
+exports.getFile = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id) return next(createCustomError('Please specify the id', 401));
+  const data = await Pyq.findById(id);
+
+  if (!data) {
+    return next(createCustomError('No pyq found with the given Id', 404));
+  }
+
+  res.json({
+    status: 'success',
+    data,
+  });
+});
+
+exports.updateFile = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const pyqData = req.body;
+
+  console.log(pyqData);
+
+  if (!id) return next(createCustomError('Please specify the id', 401));
+  const data = await Pyq.findByIdAndUpdate(id, pyqData);
+  if (!data) {
+    return next(createCustomError('No pyq found with the given Id', 404));
+  }
+  res.json({
+    status: 'success',
+    data,
+  });
+});
+
+exports.deleteFile = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id) return next(createCustomError('Please specify the id', 401));
+  await Pyq.findByIdAndDelete(id);
+  res.status(204).json({
+    status: 'success',
+  });
+});

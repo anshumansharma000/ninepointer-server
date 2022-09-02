@@ -5,7 +5,7 @@ const Video = require('../models/Video');
 exports.getVideos = CatchAsync(async (req, res, next) => {
   //duplicating req.query
   const queryObj = { ...req.query };
-  const excludedFields = ['sort', 'limit', 'page', 'fields'];
+  const excludedFields = ['sort', 'limit', 'page', 'fields', 'search'];
 
   //excluding sort limit page and fields from query object
   excludedFields.forEach((el) => delete queryObj[el]);
@@ -29,6 +29,19 @@ exports.getVideos = CatchAsync(async (req, res, next) => {
     query = query.select('-__v');
   }
 
+  if (req.query.search) {
+    query.find({
+      $or: [
+        { title: { $regex: '.*' + req.query.search + '.*', $options: 'i' } },
+        {
+          subject: { $regex: '.*' + req.query.search + '.*', $options: 'i' },
+        },
+      ],
+    });
+    // query.find({
+    //   subject: { $regex: '.*' + req.query.search + '.*', $options: 'i' },
+    // });
+  }
   const limit = req.query.limit * 1 || 20;
   const page = req.query.page * 1 || 1;
   const skip = (page - 1) * limit;

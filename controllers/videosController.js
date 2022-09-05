@@ -42,23 +42,28 @@ exports.getVideos = CatchAsync(async (req, res, next) => {
     //   subject: { $regex: '.*' + req.query.search + '.*', $options: 'i' },
     // });
   }
-  const limit = req.query.limit * 1 || 20;
+  let queryAlt = query.model.find().merge(query).skip(0).limit(0);
+  // console.log(queryAlt);
+  // let docs = await queryAlt;
+  // let numDocs = docs.length;
+
+  const limit = req.query.limit * 1 || 10;
   const page = req.query.page * 1 || 1;
   const skip = (page - 1) * limit;
 
   query = query.skip(skip).limit(limit);
-
   if (req.query.page) {
     const numVideos = await Video.countDocuments();
     if (skip >= numVideos) throw new Error("This page doesn't exist");
   }
 
-  const videos = await query;
+  const [videos, count] = await Promise.all([query, queryAlt.count()]);
 
   res.status(200).json({
     status: 'success',
     results: videos.length,
     data: videos,
+    count,
   });
 });
 

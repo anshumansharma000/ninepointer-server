@@ -7,4 +7,9 @@ router
   .get(videosController.getVideos)
   .post(videosController.addVideo);
 
+router
+  .route('/:id')
+  .get(videosController.getVideo)
+  .patch(videosController.updateVideo);
+
 module.exports = router;

@@ -129,3 +129,19 @@ exports.updateVideo = CatchAsync(async (req, res, next) => {
     data: video,
   });
 });
+
+exports.getVideo = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id) return next(createCustomError('Please specify the id', 401));
+  const data = await Video.findById(id);
+
+  if (!data) {
+    return next(createCustomError('No video found with the given Id', 404));
+  }
+
+  res.json({
+    status: 'success',
+    data,
+  });
+});

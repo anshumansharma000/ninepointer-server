@@ -9,11 +9,11 @@ router
   .get(engineeringController.getPosts)
   .post(engineeringController.createPost);
 
-router
-  .route('/:branch/:id')
-  .get()
-  .patch()
-  .delete(engineeringController.deletePost);
+// router
+//   .route('/:branch/:id')
+//   .get()
+//   .patch()
+//   .delete(engineeringController.deletePost);
 
 router.use('/pyq', fileRouter);
 router.use('/video', videoRouter);

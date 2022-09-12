@@ -10,5 +10,6 @@ router
 router
   .route('/:id')
   .get(engineeringController.getFile)
-  .patch(engineeringController.updateFile);
+  .patch(engineeringController.updateFile)
+  .delete(engineeringController.deleteFile);
 module.exports = router;

@@ -10,6 +10,7 @@ router
 router
   .route('/:id')
   .get(videosController.getVideo)
-  .patch(videosController.updateVideo);
+  .patch(videosController.updateVideo)
+  .delete(videosController.deleteVideo);
 
 module.exports = router;

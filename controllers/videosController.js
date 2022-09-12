@@ -105,7 +105,7 @@ exports.addVideo = CatchAsync(async (req, res, next) => {
 exports.deleteVideo = CatchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  if (!(await Engineering.findById(id))) {
+  if (!(await Video.findById(id))) {
     return next(createCustomError('Video not found', 404));
   }
   await Video.findByIdAndDelete(id);

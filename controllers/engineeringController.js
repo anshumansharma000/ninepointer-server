@@ -254,7 +254,7 @@ exports.uploadFile = CatchAsync((req, res, next) => {
   }
 });
 
-//get a single file from server
+//get a single file
 exports.getFile = CatchAsync(async (req, res, next) => {
   const { id } = req.params;
 

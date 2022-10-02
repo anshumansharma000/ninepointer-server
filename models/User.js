@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 var validatePassword = function (password) {
   var regex = /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,}$/g;
   return regex.test(password);
 };
 
-const UserSchema = new moogoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: {
     type: String,
   },
@@ -50,9 +52,17 @@ const UserSchema = new moogoose.Schema({
       message: "The passwords don't match",
     },
   },
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
   role: {
     type: String,
-    enum: ['admin', 'employee', 'customer'],
+    enum: ['admin', 'employee', 'customer', 'manager'],
   },
   profilePhoto: {
     type: String,
@@ -64,6 +74,38 @@ const UserSchema = new moogoose.Schema({
   dob: {
     type: Date,
   },
+});
+
+UserSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+UserSchema.methods.changedPasswordAfter = function (jwtTimeStamp) {
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return jwtTimeStamp < changedTimeStamp;
+  }
+  return false;
+};
+
+UserSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+});
+
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+
+  this.passwordConfirm = undefined;
+  next();
 });
 
 const User = mongoose.model('User', UserSchema);
